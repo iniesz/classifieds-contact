@@ -1,0 +1,104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css"
+	href="http://static.mlstatic.com/org-img/chico/chico-min-dependences.0.7.1.css">
+</head>
+
+<script type="text/javascript"
+	src="http://static.mlstatic.com/org-img/chico/chico-min-dependences.0.7.1.js"></script>
+<body>
+
+	<div class="ch-tabNavigator">
+		<ul class="ch-tabNavigator-triggers">
+			<li><a href="#question"
+				class="ch-tab ch-tab-trigger ch-tab-trigger-on"> Preguntas al
+					vendedor </a>
+			</li>
+		</ul>
+		<div class="ch-tabNavigator-content box new-questions">
+			<ol class="listQA">
+			</ol>
+			<!-- empieza el form -->
+			<div class="makeQuestion classifiedQuestion ">
+				<h4 class="typo">Hacer una pregunta al vendedor</h4>
+				<form action="http://vip-test.mercadolibre.com.ve/question/send"
+					method="post" id="form_quest">
+					<input type="hidden" name="itemId" id="itemId" value="MLV33054884" />
+					<p class="error-box" id="errorQuestion" name="errorQuestion"
+						style="display: none;">
+						<span class="ico error">La p&aacute;gina que buscas no
+							existe:</span> Escribe tu pregunta.
+					</p>
+					<textarea class="" name="questionText" id="questionText" cols="110"
+						width="90%"></textarea>
+					<p class="contQuestion">
+						<small>Quedan <span id="display">1000</span> caracteres
+							disponibles.</small>
+					</p>
+					<p class="actions">
+						<input type="submit" value="Preguntar" name="saveQuest"
+							id="saveQuest" class="btn secondary">
+					</p>
+				</form>
+			</div>
+			<a id="makeQuestIframe" href=""></a>
+			<!-- finaliza el form -->
+		</div>
+	</div>
+	<script type="text/javascript">
+	
+		function iframeQuestion(a) {
+			$("#makeQuestIframe")
+					.modal(
+							{
+								content : '<iframe src="'
+										+ a
+										+ '" width="100%" height="100%" allowtransparency="true" scrolling="auto" frameborder="0" id="questionIframe" class="loadingIframe"></iframe>',
+								width : 645,
+								height : 360,
+								cache : false,
+								onContentError : function(b, d, c) {
+									return contigency
+								},
+								onShow : function() {
+									$("#questionIframe").load(function() {
+										$(this).removeClass("loadingIframe")
+									})
+								}
+							});
+			$("#makeQuestIframe").click()
+		}
+		$("#saveQuest")
+				.click(
+						function(e) {
+							e.preventDefault();
+							var datos = $("#form_quest").serialize() + "&x=x";
+							$
+									.ajax({
+										type : "POST",
+										url : "http://vip-test.mercadolibre.com.ve/question/send",
+										data : datos + "&ajax=true",
+										dataType : "text",
+										success : function(data) {
+											var result = eval("(" + data + ")");
+											if (result.code == "REDIRECT_TO_LOGIN") {
+												iframeQuestion(result.url)
+											} else {
+												if (result.code == "ERROR") {
+													$("#errorQuestion").show()
+												} else {
+													iframeQuestion("/question/showMessage?itemId="
+															+ result.itemId
+															+ "&x=x&state="
+															+ result.questionState)
+												}
+											}
+										}
+									})
+						});
+	</script>
+</body>
+</html>
